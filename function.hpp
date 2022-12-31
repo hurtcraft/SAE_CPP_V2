@@ -33,6 +33,7 @@ void user_input_str(char buffer[]);
 bool accepted_char(char &mon_char);
 bool user_input_char(char buffer[],char &current_char);
 void print_nb_quart_singe(const JOUEUR *liste_joueurs,const int NB_JOUEUR);
+void concat_char(char *str,char letter);
 
 JOUEUR *get_previous_player( MANCHE &ma_manche, const int NB_JOUEUR , JOUEUR *liste_joueurs);
 JOUEUR *get_next_player(MANCHE &ma_manche, const int NB_JOUEUR , JOUEUR *liste_joueurs);

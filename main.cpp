@@ -61,9 +61,12 @@ int main(int argc , char *argv[]){
     int max=NB_MOTS;
     char bot_letter;
     bool solution_exist;
-    //strcpy(ma_manche.current_word,"TE");
+    
 
     srand(time(NULL));
+
+    
+    
     while (run)
     {
 
@@ -86,7 +89,6 @@ int main(int argc , char *argv[]){
         else{
             if (liste_joueurs[0].type=='R' && ma_manche.current_word[0]=='\0')
             {
-                
                 bot_letter= 65 + rand() % (( 90 + 1 ) - 65);// on choisi une lettre entre A - Z
                 ma_manche.current_char=bot_letter;
             }
@@ -120,9 +122,7 @@ int main(int argc , char *argv[]){
         }
 
 
-        
-        ma_manche.current_word[strlen(ma_manche.current_word)]=ma_manche.current_char; //on concatene la lettre saisie a la suite du mot actuel
-        
+        concat_char(ma_manche.current_word,ma_manche.current_char);
         if (is_in_dico(liste_mots,ma_manche.current_word,min,max))
         {
             solution_exist=true;

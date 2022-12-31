@@ -149,6 +149,14 @@ bool user_input_char(char buffer[],char &current_char){
     return true;
     
 }
+
+
+void concat_char(char *str,char letter){
+    strncat(str,&letter,1);
+    //str[strlen(str)]=letter;
+    
+}
+
 void init_manche(MANCHE &ma_manche){
    
     ma_manche.count=0;
@@ -190,6 +198,7 @@ void abandon(JOUEUR *current_player,bool &run,MANCHE &ma_manche){
     memset(ma_manche.current_word,0,sizeof(ma_manche.current_word));
     memset(ma_manche.buffer,0,sizeof(ma_manche.buffer));
 }
+
 bool has_lost(JOUEUR *joueur){
     return joueur->nb_quart_singe!=1.0;
 }

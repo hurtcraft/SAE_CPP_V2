@@ -76,7 +76,7 @@ void get_solution_viable(char **liste_mots, const int min , const int max ,const
     
     //parcours les solutions entre un nombre aleatoire et max
 
-    if (search_between_range(liste_mots,nombre_aleatoire-1,max,NB_JOUEURS,ma_manche))
+    if (search_between_range(liste_mots,nombre_aleatoire,max,NB_JOUEURS,ma_manche))
     {
         return;
     }
@@ -101,7 +101,7 @@ bool search_between_range(char **liste_mots, const int min , const int max ,cons
         if(longueur_mot<=2){
             continue;
         }
-        if ((longueur_mot-len_current_word)>1 && (longueur_mot-len_current_word)<NB_JOUEURS ){
+        if ((longueur_mot-len_current_word)>1 && (longueur_mot-len_current_word)%NB_JOUEURS!=0 ){
             strcpy(ma_manche.solution,liste_mots[i]);
             letter = ma_manche.solution[len_current_word];
             copie_current_word[len_current_word]=letter;
@@ -119,6 +119,62 @@ char get_letter_of_solution(MANCHE &ma_manche){
     return ma_manche.solution[strlen(ma_manche.current_word)];
 }
 
+bool letter_is_safe(char **liste_mots,char letter, MANCHE ma_manche,int min , int max){
+    char copie_current_word[MAX_CHAR];
+    strcpy(copie_current_word,ma_manche.current_word);
+    concat_char(copie_current_word,letter);
+
+    if(is_in_dico(liste_mots,copie_current_word,min,max)){
+        return false;
+    }
+    //strcpy(ma_manche.solution,copie_current_word);// si la lettre est safe alors la solution devient current_word+letter
+                                                 // autrement dit copie_current_word;
+    return true;
+}
+
+char bluff(char **liste_mots,MANCHE ma_manche,int min , int max){
+    /* renvoie une voyelle aléatoirement de sorte a bluffé*/
+    const int NB_VOYELLES=5;
+    char tab_voyelle[NB_VOYELLES+1]="AEIOU";
+
+    char letter='!';
+    char buffer[BUFFER_SIZE];
+    /*il y'a un risque que la voyelle aléatoire renvoyé termine un mot alors
+        on va tester toute les 
+    */
+    int alea;
+    char temp;
+    int len_tab_voyelle;
+    do
+    {
+        len_tab_voyelle=strlen(tab_voyelle);
+        alea=rand()%len_tab_voyelle;
+        letter=tab_voyelle[alea];
+        if (letter_is_safe(liste_mots,letter,ma_manche,min,max))
+        {
+            break;
+        }
+        
+        if (alea==NB_VOYELLES-1)
+        {
+            tab_voyelle[alea]='\0';
+        }
+        else{
+            /*
+            on supprime la lettre "unsafe" en faisant une permutation;
+             */
+            temp=tab_voyelle[len_tab_voyelle-1];
+            tab_voyelle[alea]=temp;
+            tab_voyelle[len_tab_voyelle]='\0';
+        }
+        
+        
+
+    } while (tab_voyelle!=0);
+    
+    return letter;
+    
+}
 
 
 
