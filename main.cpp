@@ -23,7 +23,7 @@ int main(int argc , char *argv[]){
     
     const int NB_JOUEUR=strlen(argv[1]);
     const int NB_MOTS=get_nb_mot_dico(file);
-
+    
     char **liste_mots=NULL;
     //initiation de la liste de mot
     liste_mots=new char*[NB_MOTS];
@@ -62,11 +62,8 @@ int main(int argc , char *argv[]){
     char bot_letter;
     bool solution_exist;
     
+    int a ;
 
-    srand(time(NULL));
-
-    
-    
     while (run)
     {
 
@@ -74,28 +71,38 @@ int main(int argc , char *argv[]){
         max = derniere_occurence(liste_mots,min,max,ma_manche.current_word);
         
         
-        //cout <<ma_manche.solution <<" "<<min<<" , "<<max<<endl;
+        //cout <<ma_manche.solution <<" "<<min<<" , "<<max<<"\n";
         current_player=&liste_joueurs[ma_manche.count];
         affichage_jeu(current_player,ma_manche);
 
         if (current_player->type=='H')
         {
-            if (!user_input_char(ma_manche.buffer,ma_manche.current_char))
+            if (!user_input_char(ma_manche))
             {
             // si le joueur rentre autre chose qu'une lettre ou un ? ou un ! alors on reviens en début de boucle
             continue;
             }
         }
+        
         else{
-            if (liste_joueurs[0].type=='R' && ma_manche.current_word[0]=='\0')
+            if (liste_joueurs[0].type=='R' && strlen(ma_manche.current_word)==0)
             {
-                bot_letter= 65 + rand() % (( 90 + 1 ) - 65);// on choisi une lettre entre A - Z
+
+                bot_letter=65 + rand() % (( 90 + 1 ) - 65);// on choisi une lettre entre A - Z
                 ma_manche.current_char=bot_letter;
             }
             else{
                 get_solution_viable(liste_mots,min,max,NB_JOUEUR,ma_manche);
+
+                
                 if(strcmp(ma_manche.solution,"NO_SOLUTION")==0){
-                    bot_letter='?';
+                    if (solution_exist)
+                    {
+                        bot_letter=bluff(liste_mots,ma_manche,min,max);
+                    }
+                    else{
+                        bot_letter='?';
+                    }
                 }
                 else{
                     bot_letter=get_letter_of_solution(ma_manche);
@@ -106,10 +113,11 @@ int main(int argc , char *argv[]){
             }
 
             cout << bot_letter <<endl;
-            cout << "\n"<<"solution : " <<ma_manche.solution<<min<<" , "<<max<<endl;
+            //cout << "\n"<<"solution : " <<ma_manche.solution<<min<<" , "<<max<<endl;
 
             
         }
+        
         if (min==-1 || max==-1)
         {
             //si min = -1 alors max aussi est égale à -1
@@ -123,6 +131,7 @@ int main(int argc , char *argv[]){
 
 
         concat_char(ma_manche.current_word,ma_manche.current_char);
+        
         if (is_in_dico(liste_mots,ma_manche.current_word,min,max))
         {
             solution_exist=true;
@@ -145,18 +154,23 @@ int main(int argc , char *argv[]){
             ma_manche.current_word[strlen(ma_manche.current_word)-1]=0;
             cout << ma_manche.count+1 << current_player->type<< ", saisir le mot > ";
             if (current_player->type=='H'){
-                user_input_str(ma_manche.buffer);
+                user_input_str(ma_manche);
             }
             else{
                 get_solution_viable(liste_mots,min,max,NB_JOUEUR,ma_manche);
-                if (strcmp(ma_manche.solution,"NO_SOLUTION")==0)
+                if (strcmp(ma_manche.solution,"NO_SOLUTION")==0 )
                 {
-                    ma_manche.current_char='!';
-                    abandon(current_player,run,ma_manche);
-                    print_nb_quart_singe(liste_joueurs,NB_JOUEUR);
+                    //ma_manche.current_char='!';
+                    //abandon(current_player,run,ma_manche);
+                    cout << "je_bluff";
+                    bot_letter=bluff(liste_mots,ma_manche,min,max);
+                    concat_char(ma_manche.current_word,bot_letter);
+                    strcpy(ma_manche.buffer,ma_manche.current_word);
+                    //print_nb_quart_singe(liste_joueurs,NB_JOUEUR);
                 }
                 else{
                     strcpy(ma_manche.buffer,ma_manche.solution);
+                    cout << ma_manche.buffer <<"\n";
                 }
                 
             }
@@ -185,6 +199,7 @@ int main(int argc , char *argv[]){
             continue;
             
         }
+
         if (ma_manche.current_char=='!'){
             abandon(current_player,run,ma_manche);
             print_nb_quart_singe(liste_joueurs,NB_JOUEUR);
@@ -205,7 +220,7 @@ int main(int argc , char *argv[]){
 
         }
         
-
+        
         ma_manche.count++;
         ma_manche.count = ma_manche.count % NB_JOUEUR;
 

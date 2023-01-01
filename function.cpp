@@ -127,21 +127,28 @@ bool accepted_char(char &mon_char){
     return (isalpha(mon_char) || mon_char=='?' || mon_char=='!');
     
 }
-void user_input_str(char buffer[]){
-    cin >> setw(MAX_CHAR)>>buffer;
+void user_input_str(MANCHE &ma_manche){
+    
+    cin >> setw(MAX_CHAR)>>ma_manche.buffer;
     cin.ignore(INT16_MAX, '\n');
-    for (size_t i = 0; i < strlen(buffer); i++)
+    if (ma_manche.buffer[0]=='?' && strlen(ma_manche.current_word)<2)
     {
-        buffer[i]=toupper(buffer[i]);
+        cout << "nombre de lettres insuffisantes\n";
+        return;
+    }
+    
+    for (size_t i = 0; i < strlen(ma_manche.buffer); i++)
+    {
+        ma_manche.buffer[i]=toupper(ma_manche.buffer[i]);
     }
     
 }
-bool user_input_char(char buffer[],char &current_char){
+bool user_input_char(MANCHE &ma_manche){
     
-    user_input_str(buffer);
+    user_input_str(ma_manche);
 
-    current_char=buffer[0];
-    if (!accepted_char(current_char))
+    ma_manche.current_char=ma_manche.buffer[0];
+    if (!accepted_char(ma_manche.current_char))
     {
         cout << "saisie incorrect veuillez saisir QUE des LETTRES \n";
         return false;
@@ -197,6 +204,10 @@ void abandon(JOUEUR *current_player,bool &run,MANCHE &ma_manche){
     cout<<"le joueur "<< ma_manche.count+1<<current_player->type <<" abandonne la manche et prend un quart de singe\n";
     memset(ma_manche.current_word,0,sizeof(ma_manche.current_word));
     memset(ma_manche.buffer,0,sizeof(ma_manche.buffer));
+}
+char random_letter(){
+    srand(time(NULL));
+    return 65 + rand() % (( 90 + 1 ) - 65);
 }
 
 bool has_lost(JOUEUR *joueur){

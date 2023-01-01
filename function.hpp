@@ -29,15 +29,15 @@ bool is_in_dico( char **liste_mot ,  char *str, int min,int max);
 void create_joueurs(JOUEUR *liste_joueurs,char *str);
 void clear_joueur_array(JOUEUR *liste_joueurs);
 void affichage_jeu(JOUEUR *current_player, MANCHE &ma_manche);
-void user_input_str(char buffer[]);
+void user_input_str(MANCHE &ma_manche);
 bool accepted_char(char &mon_char);
-bool user_input_char(char buffer[],char &current_char);
+bool user_input_char(MANCHE &ma_manche);
 void print_nb_quart_singe(const JOUEUR *liste_joueurs,const int NB_JOUEUR);
 void concat_char(char *str,char letter);
 
 JOUEUR *get_previous_player( MANCHE &ma_manche, const int NB_JOUEUR , JOUEUR *liste_joueurs);
 JOUEUR *get_next_player(MANCHE &ma_manche, const int NB_JOUEUR , JOUEUR *liste_joueurs);
-
+char random_letter();
 void abandon(JOUEUR *current_player,bool &run,MANCHE &ma_manche);
 bool has_lost(JOUEUR *joueur);
 
