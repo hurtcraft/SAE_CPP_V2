@@ -25,7 +25,7 @@ void dico_to_2Darray(char **liste_mots,int nb_mots, std::ifstream &file);
 void clear_2Darray(char **liste_mots , int nb_mots);
 
 void init_manche(MANCHE &ma_manche);
-bool is_in_dico( char **liste_mot ,  char *str, int min,int max);
+bool is_in_dico( char **liste_mot ,  char *str, const int NB_MAX);
 void create_joueurs(JOUEUR *liste_joueurs,char *str);
 void clear_joueur_array(JOUEUR *liste_joueurs);
 void affichage_jeu(JOUEUR *current_player, MANCHE &ma_manche);

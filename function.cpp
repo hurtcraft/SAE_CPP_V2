@@ -70,10 +70,12 @@ void clear_2Darray(char **liste_mots , int nb_mots){
     
 }
 
-bool is_in_dico( char **liste_mot ,  char *str, int min,int max){
+bool is_in_dico( char **liste_mot ,  char *str, const int NB_MOTS){
     if(strlen(str)<=2){
         return false;
     }
+    int min =0 ;
+    int max =NB_MOTS;
     int millieu=(min+max)/2;
     while(min<=max){
         if (strcmp(liste_mot[millieu],str)==0 )

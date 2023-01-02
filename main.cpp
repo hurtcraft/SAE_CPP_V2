@@ -45,7 +45,7 @@ int main(int argc , char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    char buffer[BUFFER_SIZE];
+    
     
 
     create_joueurs(liste_joueurs,argv[1]);
@@ -62,7 +62,7 @@ int main(int argc , char *argv[]){
     char bot_letter;
     bool solution_exist;
     
-    int a ;
+    char copie_current_word[MAX_CHAR];
 
     while (run)
     {
@@ -92,13 +92,19 @@ int main(int argc , char *argv[]){
                 ma_manche.current_char=bot_letter;
             }
             else{
-                get_solution_viable(liste_mots,min,max,NB_JOUEUR,ma_manche);
+                get_solution_viable(liste_mots,NB_MOTS,NB_JOUEUR,ma_manche);
 
-                
+                    //cout << min <<" : " <<max << "cword : "<<ma_manche.current_word;
+
                 if(strcmp(ma_manche.solution,"NO_SOLUTION")==0){
-                    if (solution_exist)
+                    
+                    strcpy(copie_current_word,ma_manche.current_word);
+                    copie_current_word[strlen(copie_current_word)-1]='\0'; // prend tout sauf le dernier char
+     
+                    if (premiere_occurence(liste_mots,0,NB_MOTS,copie_current_word)!=-1)
                     {
-                        bot_letter=bluff(liste_mots,ma_manche,min,max);
+                        bot_letter=bluff(liste_mots,ma_manche,NB_MOTS);
+                        
                     }
                     else{
                         bot_letter='?';
@@ -132,7 +138,7 @@ int main(int argc , char *argv[]){
 
         concat_char(ma_manche.current_word,ma_manche.current_char);
         
-        if (is_in_dico(liste_mots,ma_manche.current_word,min,max))
+        if (is_in_dico(liste_mots,ma_manche.current_word,NB_MOTS))
         {
             solution_exist=true;
             current_player->nb_quart_singe+=0.25;
@@ -157,27 +163,35 @@ int main(int argc , char *argv[]){
                 user_input_str(ma_manche);
             }
             else{
-                get_solution_viable(liste_mots,min,max,NB_JOUEUR,ma_manche);
+                get_solution_viable(liste_mots,NB_MOTS,NB_JOUEUR,ma_manche);
                 if (strcmp(ma_manche.solution,"NO_SOLUTION")==0 )
                 {
+                    int index_solution=premiere_occurence(liste_mots,0,NB_MOTS,ma_manche.current_word);
+                    if (index_solution!=-1)
+                    {                   
+                        strcpy(ma_manche.buffer,liste_mots[index_solution]);
+                    }
+                    else{
+                        strcpy(ma_manche.buffer,"NO_SOLUTION");
+                    }
+                    cout << ma_manche.buffer <<"\n";
                     //ma_manche.current_char='!';
                     //abandon(current_player,run,ma_manche);
+                    /*
                     cout << "je_bluff";
-                    bot_letter=bluff(liste_mots,ma_manche,min,max);
+                    bot_letter=bluff(liste_mots,ma_manche,NB_MOTS);
                     concat_char(ma_manche.current_word,bot_letter);
                     strcpy(ma_manche.buffer,ma_manche.current_word);
+                    */
                     //print_nb_quart_singe(liste_joueurs,NB_JOUEUR);
                 }
-                else{
-                    strcpy(ma_manche.buffer,ma_manche.solution);
-                    cout << ma_manche.buffer <<"\n";
-                }
+
                 
             }
             //cout<<ma_manche.buffer<<endl;
             if (debut_pareil(ma_manche.buffer,ma_manche.current_word))
             {
-                if (is_in_dico(liste_mots,ma_manche.buffer,min,max))
+                if (is_in_dico(liste_mots,ma_manche.buffer,NB_MOTS))
                 {
                 current_player=get_next_player(ma_manche,NB_JOUEUR,liste_joueurs);
                 cout<< "le mot " << ma_manche.buffer <<" existe, ";

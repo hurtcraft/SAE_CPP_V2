@@ -47,7 +47,7 @@ int premiere_occurence( char **liste_mots, int minimum, int maximum, const char 
 int derniere_occurence( char **liste_mots, int minimum, int maximum, const char *current_word){
     int min = minimum;
     int max = maximum -1;
-    int indice = -1;
+    int indice = -2;
     while(min < max){
         int milieu = (min + max) / 2;
         if (debut_pareil(liste_mots[milieu], current_word)){
@@ -59,22 +59,24 @@ int derniere_occurence( char **liste_mots, int minimum, int maximum, const char 
         else
             min = milieu +1;
     }
-    return indice;
+    return indice+1;
 }
 
-void get_solution_viable(char **liste_mots, const int min , const int max ,const int NB_JOUEURS,MANCHE &ma_manche){
+void get_solution_viable(char **liste_mots,const int NB_MOTS,const int NB_JOUEURS,MANCHE &ma_manche){
     strcpy(ma_manche.solution,"NO_SOLUTION");
+    /*
     if (min==-1 && max==-1)
     {   
         return;
     }
+    */
     
 
     //cout << "\ntest : " <<min <<" , "<< max <<" , "<< nombre_aleatoire<<"\n";
     
     //parcours les solutions entre un nombre aleatoire et max
 
-    if (search_between_range(liste_mots,min,max,NB_JOUEURS,ma_manche))
+    if (search_between_range(liste_mots,NB_MOTS,NB_JOUEURS,ma_manche))
     {
         //cout << "solution : "<< ma_manche.solution<<"min : "<<min<<"max : "<< max <<"\n" ;  
         return;
@@ -84,6 +86,36 @@ void get_solution_viable(char **liste_mots, const int min , const int max ,const
 
 
 }
+bool search_between_range(char **liste_mots,const int NB_MOTS ,const int NB_JOUEURS,MANCHE &ma_manche){
+    int longueur_mot;
+    int len_current_word=strlen(ma_manche.current_word);
+    char letter;
+    char copie_current_word[MAX_CHAR];
+
+    strcpy(copie_current_word,ma_manche.current_word);
+
+    for (size_t i = 0; i < NB_MOTS; i++)
+    {
+        longueur_mot=strlen(liste_mots[i]);
+        if((longueur_mot-len_current_word)>1 && debut_pareil(liste_mots[i],ma_manche.current_word)){
+
+            letter=liste_mots[i][len_current_word];
+            if (letter_is_safe(liste_mots,letter,ma_manche,NB_MOTS))
+            {
+                strcpy(ma_manche.solution,liste_mots[i]);
+                return true;
+            }
+            else{
+                concat_char(copie_current_word,letter);
+                //i=derniere_occurence(liste_mots,min,max,copie_current_word);
+                //cout << i;
+            }
+            
+        }
+    }
+    return false;
+}
+/*
 bool search_between_range(char **liste_mots, const int min , const int max ,const int NB_JOUEURS,MANCHE &ma_manche){
     int longueur_mot;
     int len_current_word=strlen(ma_manche.current_word);
@@ -101,33 +133,41 @@ bool search_between_range(char **liste_mots, const int min , const int max ,cons
         if(longueur_mot<=2){
             continue;
         }
-        if ((longueur_mot-len_current_word)>1 /*&& (longueur_mot-len_current_word+NB_JOUEURS)%NB_JOUEURS!=0*/ ){
+        if ((longueur_mot-len_current_word)>1){
 
             strcpy(ma_manche.solution,liste_mots[i]);
             letter = get_letter_of_solution(ma_manche);
-            concat_char(copie_current_word,letter);
+            //concat_char(copie_current_word,letter);
             //copie_current_word[len_current_word]=letter;
-            if(is_in_dico(liste_mots , copie_current_word , min , max)){
-                i=derniere_occurence(liste_mots,i,max,copie_current_word);
-                continue;
-            }
-            cout << " min : "<<min << " max : "<< max << " solution : "<< ma_manche.solution<< "\n";
+            //cout << " min : "<<min << " max : "<< max << " solution : "<< ma_manche.solution<< "  ";
 
-            return true;
+            if(letter_is_safe(liste_mots,letter,ma_manche,min,max)){
+                return true;
+            }
+            else{
+                
+                i=derniere_occurence(liste_mots,i,max,copie_current_word)+1;
+                concat_char(copie_current_word,letter);
+                //continue;
+            }
+
+            //return true;
         }
     }
     return false;
 }
+*/
 char get_letter_of_solution(MANCHE &ma_manche){
     return ma_manche.solution[strlen(ma_manche.current_word)];
 }
 
-bool letter_is_safe(char **liste_mots,char letter, MANCHE ma_manche,int min , int max){
+bool letter_is_safe(char **liste_mots,char letter, MANCHE ma_manche,const int NB_MOTS){
     char copie_current_word[MAX_CHAR];
     strcpy(copie_current_word,ma_manche.current_word);
     concat_char(copie_current_word,letter);
+    //cout << "copie : "<< copie_current_word<< "\n";
 
-    if(is_in_dico(liste_mots,copie_current_word,min,max)){
+    if(is_in_dico(liste_mots,copie_current_word,NB_MOTS)){
         return false;
     }
     //strcpy(ma_manche.solution,copie_current_word);// si la lettre est safe alors la solution devient current_word+letter
@@ -135,11 +175,10 @@ bool letter_is_safe(char **liste_mots,char letter, MANCHE ma_manche,int min , in
     return true;
 }
 
-char bluff(char **liste_mots,MANCHE ma_manche,int min , int max){
+char bluff(char **liste_mots,MANCHE ma_manche,int NB_MOTS){
     /* renvoie une voyelle aléatoirement de sorte a bluffé*/
     const int NB_VOYELLES=5;
     char tab_voyelle[NB_VOYELLES+1]="AEIOU";
-
     char letter='!';
     char buffer[BUFFER_SIZE];
     /*il y'a un risque que la voyelle aléatoire renvoyé termine un mot alors
@@ -148,12 +187,16 @@ char bluff(char **liste_mots,MANCHE ma_manche,int min , int max){
     int alea;
     char temp;
     int len_tab_voyelle;
+    ma_manche.current_word[strlen(ma_manche.current_word)-1]='\0';
+    int min = premiere_occurence(liste_mots,0,NB_MOTS,ma_manche.current_word);
+    int max = derniere_occurence(liste_mots,min,NB_MOTS,ma_manche.current_word);
+
     do
     {
         len_tab_voyelle=strlen(tab_voyelle);
         alea=rand()%len_tab_voyelle;
         letter=tab_voyelle[alea];
-        if (letter_is_safe(liste_mots,letter,ma_manche,min,max))
+        if (letter_is_safe(liste_mots,letter,ma_manche,NB_MOTS))
         {
             break;
         }
